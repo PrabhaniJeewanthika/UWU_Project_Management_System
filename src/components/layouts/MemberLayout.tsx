@@ -1,8 +1,8 @@
 import { Box, Flex, HStack, Text, VStack } from '@chakra-ui/react';
 import React from 'react';
-import Header from '../ui/Header';
+import Header from '../ui/PublicUI/Header';
 import { Outlet } from 'react-router';
-import MemberSidebar from '../ui/MemberSidebar';
+import MemberSidebar from '../ui/MemberUI/MemberSidebar';
 
 
 const MemberLayout = () => {

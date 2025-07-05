@@ -1,8 +1,8 @@
 import { Box, Flex } from '@chakra-ui/react';
 import React from 'react';
-import Header from '../ui/Header';
+import Header from '../ui/PublicUI/Header';
 import { Outlet } from 'react-router-dom';
-import CoordinatorSidebar from '../ui/CoordinatorSidebar';
+import CoordinatorSidebar from '../ui/CoordinatorUI/CoordinatorSidebar';
 
 const CoordinatorLayout = () => {
   return (

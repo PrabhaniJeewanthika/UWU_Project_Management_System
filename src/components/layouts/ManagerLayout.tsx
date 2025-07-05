@@ -1,8 +1,8 @@
 import { Box, Flex, HStack, Text, VStack } from '@chakra-ui/react';
 import React from 'react';
 import { Outlet } from 'react-router';
-import ManagerSidebar from '../ui/ManagerSidebar';
-import Header from '../ui/Header';
+import ManagerSidebar from '../ui/ManagerUI/ManagerSidebar';
+import Header from '../ui/PublicUI/Header';
 
 
 const ManagerLayout = () => {
