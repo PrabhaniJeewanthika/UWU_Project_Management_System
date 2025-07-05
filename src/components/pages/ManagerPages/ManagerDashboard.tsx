@@ -4,6 +4,7 @@ import {
 import clsx from 'clsx';
 import React from 'react';
 import { Outlet } from "react-router-dom";
+import HomePageKanbanBoard from "../../ui/PublicUI/HomePageKanbanBoard";
 
 const ManagerDashboard = () => {
     return (
@@ -21,10 +22,10 @@ const ManagerDashboard = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-10 gap-5">
                 <div className="lg:col-span-7 xl:col-span-8">
-
+                    <HomePageKanbanBoard />
                 </div>
                 <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-6">
-                    
+
                 </div>
             </div>
         </div>
