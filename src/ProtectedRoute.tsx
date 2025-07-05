@@ -5,7 +5,7 @@ type Props = {
   allowedRole: 'manager' | 'member' | 'coordinator';
 };
 
-const ProtectedRoutes: React.FC<Props> = ({ allowedRole }) => {
+const ProtectedRoute: React.FC<Props> = ({ allowedRole }) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   const redirectPath = {
@@ -20,4 +20,4 @@ const ProtectedRoutes: React.FC<Props> = ({ allowedRole }) => {
   return <Outlet />;
 };
 
-export default ProtectedRoutes;
+export default ProtectedRoute;
