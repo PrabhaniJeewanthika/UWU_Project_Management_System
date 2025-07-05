@@ -4,11 +4,12 @@ import React from "react"
 import ReactDOM from "react-dom/client"
 import { BrowserRouter, createBrowserRouter } from "react-router"
 import App from "./App"
-import InternalLayout from "./components/layouts/InternalLayout"
+
 import RouteConfigs from "./app-routes"
+import ManagerLayout from "./components/layouts/ManagerLayout"
 
 const router = createBrowserRouter([
-  { path: "/app", Component: InternalLayout },
+  { path: "/app", Component: ManagerLayout },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
