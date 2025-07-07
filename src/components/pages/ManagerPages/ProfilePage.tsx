@@ -28,3 +28,14 @@ type FormData = {
 };
 
 const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+
+const ProfilePage: React.FC = () => {
+  const { register, handleSubmit, watch, getValues } = useForm<FormData>({
+    defaultValues: {
+      name: 'K N P J Ananda',
+      email: 'iit22049@std.uwu.ac.lk',
+      password: '',
+      academicYear: '2nd Year',
+      bio: 'I am a 2nd year student at UWU.',
+    },
+  });
