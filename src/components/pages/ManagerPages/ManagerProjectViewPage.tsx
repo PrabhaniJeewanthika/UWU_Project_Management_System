@@ -1,12 +1,13 @@
 import { AppWindow, CheckCircle, Hourglass, Loader2, Circle } from 'lucide-react';
 import React from 'react';
 import { useParams } from 'react-router';
-import Button from '../ui/Button';
-import HomePageKanbanBoard from '../ui/HomePageKanbanBoard';
+import Button from '../../ui/PublicUI/Button';
+import HomePageKanbanBoard from '../../ui/PublicUI/HomepageKanbanBoard';
 
-const ProjectViewPage = () => {
-  const { id } = useParams();
+const ManagerProjectViewPage = () => {
+  const { id } = useParams(); // Get project ID from URL parameters
 
+  // Render a status badge with corresponding icon and style
   const renderBadge = (status: string, count: number) => {
     let icon, className;
 
@@ -16,7 +17,7 @@ const ProjectViewPage = () => {
         className = 'bg-yellow-100 text-yellow-800';
         break;
       case 'In Progress':
-        icon = <Loader2 size={12} className='animate-spin' />;
+        icon = <Loader2 size={12} className='animate-spin' />; // Animated icon for active status
         className = 'bg-blue-100 text-blue-800';
         break;
       case 'Testing':
@@ -44,12 +45,15 @@ const ProjectViewPage = () => {
     <div className='flex flex-col gap-6 pb-4'>
       <div className='flex justify-between'>
         <div>
+          {/* Page title with dynamic project ID */}
           <div className='font-bold text-3xl flex gap-2 items-center'>
             <AppWindow size={30} />
             Project {id}
           </div>
           <div className='text text-xs'>Description Description Description</div>
         </div>
+
+        {/* Action buttons for project management */}
         <div className='flex gap-3'>
           <Button>Create Task</Button>
           <Button>Add Member</Button>
@@ -58,6 +62,7 @@ const ProjectViewPage = () => {
         </div>
       </div>
 
+      {/* Basic project details layout */}
       <div className='grid grid-cols-2 gap-4'>
         <div className='flex flex-col w-full border rounded-md'>
           <TupleCardRow data={{ title: "Description", value: "Project Management System" }} />
@@ -66,17 +71,22 @@ const ProjectViewPage = () => {
           <TupleCardRow data={{ title: "End Date", value: "07-10-2025" }} />
         </div>
 
+        {/* Reserved section for future widgets (e.g. progress, charts) */}
         <div className=''>
           
         </div>
       </div>
 
+      {/* Member list table */}
       <MemberDetails />
+
+      {/* Task Kanban board section */}
       <HomePageKanbanBoard />
     </div>
   );
 };
 
+// Component to display title-value pairs in a bordered row
 const TupleCardRow = ({ data }: any) => (
   <div className='w-full grid grid-cols-2 p-2 text-xs border-b'>
     <div className='font-bold border-r'>{data.title}</div>
@@ -84,6 +94,7 @@ const TupleCardRow = ({ data }: any) => (
   </div>
 );
 
+// Member details table with static sample data
 const MemberDetails = () => (
   <div className='flex flex-col border rounded-md'>
     <div className='grid grid-cols-3 font-bold p-1 border-b'>
@@ -101,4 +112,4 @@ const MemberDetails = () => (
   </div>
 );
 
-export default ProjectViewPage;
+export default ManagerProjectViewPage;

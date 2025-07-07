@@ -3,9 +3,10 @@ import { useParams } from 'react-router';
 import { AppWindow, CheckCircle, Hourglass, Loader2, Circle, Trash2 } from 'lucide-react';
 import Button from '../../ui/PublicUI/Button';
 
-const TaskViewPage = () => {
-  const { id } = useParams();
+const ManagerTaskViewPage = () => {
+  const { id } = useParams(); // Get task ID from the URL
 
+  // Local state to manage comments and input field
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState([
     {
@@ -22,6 +23,7 @@ const TaskViewPage = () => {
     },
   ]);
 
+  // Add a new comment to the top of the list
   const handleAddComment = () => {
     if (!commentText.trim()) return;
     const newComment = {
@@ -34,11 +36,13 @@ const TaskViewPage = () => {
     setCommentText('');
   };
 
+  // Remove a comment by its ID
   const handleRemoveComment = (id: number) => {
     const updated = comments.filter((c) => c.id !== id);
     setComments(updated);
   };
 
+  // Render a styled badge based on task status
   const getStatusBadge = (status: string) => {
     const base = 'text-xs font-semibold rounded-full px-2 py-1 flex items-center gap-1';
     switch (status) {
@@ -83,6 +87,7 @@ const TaskViewPage = () => {
   return (
     <div className='flex flex-col gap-6 pb-4'>
       <div className='flex justify-between'>
+        {/* Header with task title and actions */}
         <div>
           <div className='font-bold text-3xl flex gap-2 items-center'>
             <AppWindow size={30} />
@@ -90,19 +95,24 @@ const TaskViewPage = () => {
           </div>
           <div className='text text-xs text-gray-500'>Description Description Description</div>
         </div>
+        {/* Task control buttons (placeholders) */}
         <div className='flex gap-3'>
           <Button>Edit Task</Button>
           <Button>Delete Task</Button>
         </div>
       </div>
 
+      {/* Left: task details, Right: comment input */}
       <div className='grid grid-cols-2 gap-4'>
         <div className='flex flex-col w-full border rounded-md'>
           <TupleCardRow data={{ title: 'Description', value: 'Project Management System' }} />
           <TupleCardRow data={{ title: 'Assigned Member', value: 'K N P J Ananda' }} />
           <TupleCardRow data={{ title: 'Task Deadline', value: '06-06-2025' }} />
+          {/* Render status badge as component using `isComponent` flag */}
           <TupleCardRow data={{ title: 'Current Status', value: getStatusBadge('TODO') }} isComponent />
         </div>
+
+        {/* Comment input area */}
         <div className='border rounded-md p-4 text-sm flex flex-col gap-2'>
           <h2 className='text-base font-semibold'>Leave a Comment</h2>
           <textarea
@@ -121,6 +131,7 @@ const TaskViewPage = () => {
         </div>
       </div>
 
+      {/* Render list of comments */}
       <div className='flex flex-col gap-2'>
         <h2 className='text-base font-semibold'>Comments</h2>
         {comments.map((comment) => (
@@ -132,6 +143,7 @@ const TaskViewPage = () => {
               </div>
               <div className='text-sm mt-2'>{comment.message}</div>
             </div>
+            {/* Delete button for comment */}
             <button
               onClick={() => handleRemoveComment(comment.id)}
               className='text-xs text-red-600 hover:text-red-800'
@@ -146,6 +158,8 @@ const TaskViewPage = () => {
   );
 };
 
+// Reusable component to show title-value pairs
+// If value is a React component, `isComponent` flag allows rendering directly
 const TupleCardRow = ({
   data,
   isComponent = false,
@@ -161,4 +175,4 @@ const TupleCardRow = ({
   );
 };
 
-export default TaskViewPage;
+export default ManagerTaskViewPage;
