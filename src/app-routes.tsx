@@ -6,6 +6,10 @@ import ManagerLayout from './components/layouts/ManagerLayout';
 import ManagerDashboard from './components/pages/ManagerPages/ManagerDashboard';
 import ProtectedRoutes from './ProtectedRoute';
 import ProtectedRoute from './ProtectedRoute';
+import ManagerProjectListPage from './components/pages/ManagerPages/ManagerProjectListPage';
+import ManagerProjectViewPage from './components/pages/ManagerPages/ManagerProjectViewPage';
+import ManagerTaskListPage from './components/pages/ManagerPages/ManagerTaskListPage';
+import ManagerTaskViewPage from './components/pages/ManagerPages/ManagerTaskViewPage';
 const RouteConfigs = () => {
     const element = useRoutes([
        {
@@ -17,11 +21,11 @@ const RouteConfigs = () => {
           element: <ManagerLayout />,
           children: [
             { index: true, element: <ManagerDashboard /> },
-            { path: 'projects', element:"" },
-            { path: 'projects/:id', element: "" },
-            { path: 'tasks', element: "" },
-            { path: 'tasks/:id', element: ""},
-            { path: 'reports', element: "" },
+            { path: 'projects', element: <ManagerProjectListPage /> },
+            { path: 'projects/:id', element: <ManagerProjectViewPage /> },
+            { path: 'tasks', element: <ManagerTaskListPage /> },
+            { path: 'tasks/:id', element: <ManagerTaskViewPage /> },
+            { path: 'reports', element: ""  },
             { path: 'notices', element: "" },
             { path: 'calendar', element:"" },
             { path: 'profile', element: "" },
