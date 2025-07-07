@@ -1,10 +1,7 @@
 import React from 'react';
 import { useRoutes } from 'react-router';
-
-
 import ManagerLayout from './components/layouts/ManagerLayout';
 import ManagerDashboard from './components/pages/ManagerPages/ManagerDashboard';
-import ProtectedRoutes from './ProtectedRoute';
 import ProtectedRoute from './ProtectedRoute';
 import ManagerProjectListPage from './components/pages/ManagerPages/ManagerProjectListPage';
 import ManagerProjectViewPage from './components/pages/ManagerPages/ManagerProjectViewPage';

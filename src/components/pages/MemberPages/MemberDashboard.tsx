@@ -3,10 +3,11 @@ import {
     Heading
   } from "@chakra-ui/react";
   import clsx from "clsx";
-  import HomePageKanbanBoard from "../ui/HomePageKanbanBoard";
-  import CalendarArea from "../ui/CalendarArea";
-  import Progress from "../ui/Progress";
+
   import { AppWindow, LayoutDashboard } from "lucide-react";
+import HomePageKanbanBoard from "../../ui/PublicUI/HomepageKanbanBoard";
+import CalendarArea from "../../ui/PublicUI/CalendarArea";
+import Progress from "../../ui/PublicUI/Progress";
   
   
   const MemberDashboard = () => {
