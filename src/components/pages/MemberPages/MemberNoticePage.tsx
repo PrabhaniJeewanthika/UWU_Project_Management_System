@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, EyeOff, CheckCircle } from 'lucide-react';
 import { useDisclosure } from '@chakra-ui/react';
-import { Button } from '@chakra-ui/react';
+
 
 type Notice = {
     id: number;
@@ -35,7 +35,7 @@ const initialNotices: Notice[] = [
     }
 ];
 
-const NoticePage = () => {
+const MemberNoticePage = () => {
     const noticeModal = useDisclosure();
     const [notices, setNotices] = useState<Notice[]>(initialNotices);
 
@@ -56,9 +56,6 @@ const NoticePage = () => {
                         Notices
                     </div>
                     <div className='text text-xs'>Stay updated with the latest announcements and reminders</div>
-                </div>
-                <div className='flex gap-3'>
-                    <Button onClick={noticeModal.onOpen}>New Notice</Button>
                 </div>
             </div>
             <div className='flex flex-col gap-3'>
@@ -99,4 +96,4 @@ const NoticeCard = ({ data, onMark }: { data: Notice; onMark: () => void }) => {
     );
 };
 
-export default NoticePage;
+export default MemberNoticePage;

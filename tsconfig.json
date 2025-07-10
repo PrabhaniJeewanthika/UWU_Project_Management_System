@@ -21,7 +21,11 @@
     "jsx": "react-jsx",
     "customConditions": [
       "source"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "ui/*": ["src/ui/*"]
+    }
   },
   "exclude": [
     "node_modules"
