@@ -22,7 +22,7 @@ import ProfilePage from './components/pages/MemberPages/MemberProfilePage';
 import MemberNoticePage from './components/pages/MemberPages/MemberNoticePage';
 import StartPage from './components/pages/PublicPages/StartPage';
 import LoginPage from './components/pages/PublicPages/LoginPage';
-import CoordinatorLoginPage from './components/pages/PublicPages/CoordinatorLogin';
+import CoordinatorLoginPage from './components/pages/CoordinatorPages/CoordinatorLogin';
 import AuthPage from './components/pages/PublicPages/AuthPage';
 
 
