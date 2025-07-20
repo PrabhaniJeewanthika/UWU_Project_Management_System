@@ -1,15 +1,31 @@
 import React from 'react';
-import { useRoutes } from 'react-router';
+import { useRoutes } from 'react-router-dom';
+
+import ProtectedRoute from './ProtectedRoute';
+
+// Public Pages
+import StartPage from './components/pages/PublicPages/StartPage';
+import LoginPage from './components/pages/PublicPages/LoginPage';
+import CoordinatorLoginPage from './components/pages/CoordinatorPages/CoordinatorLogin';
+
+// Layouts
 import ManagerLayout from './components/layouts/ManagerLayout';
 import MemberLayout from './components/layouts/MemberLayout';
-import MemberDashboard from './components/pages/MemberPages/MemberDashboard';
+import CoordinatorLayout from './components/layouts/CoordinatorLayout';
+
+// Manager Pages
 import ManagerDashboard from './components/pages/ManagerPages/ManagerDashboard';
-import ProtectedRoute from './ProtectedRoute';
 import ManagerProfilePage from './components/pages/ManagerPages/ManagerProfilePage';
 import ManagerProjectListPage from './components/pages/ManagerPages/ManagerProjectListPage';
 import ManagerProjectViewPage from './components/pages/ManagerPages/ManagerProjectViewPage';
 import ManagerTaskListPage from './components/pages/ManagerPages/ManagerTaskListPage';
 import ManagerTaskViewPage from './components/pages/ManagerPages/ManagerTaskViewPage';
+import ManagerReportPage from './components/pages/ManagerPages/ManagerReportPage';
+import ManagerNoticePage from './components/pages/ManagerPages/ManagerNoticePage';
+import ManagerCalendarPage from './components/pages/ManagerPages/ManagerCalendarPage';
+
+// Member Pages
+import MemberDashboard from './components/pages/MemberPages/MemberDashboard';
 import MemberProjectListPage from './components/pages/MemberPages/MemberProjectList';
 import MemberProjectViewPage from './components/pages/MemberPages/MemberProjectView';
 import MemberTaskListPage from './components/pages/MemberPages/MemberTasksList';
@@ -18,10 +34,8 @@ import MemberReportHomePage from './components/pages/MemberPages/MemberReportHom
 import MemberCalendarPage from './components/pages/MemberPages/MemberCalendarPage';
 import ProfilePage from './components/pages/MemberPages/MemberProfilePage';
 import MemberNoticePage from './components/pages/MemberPages/MemberNoticePage';
-import ManagerReportPage from './components/pages/ManagerPages/ManagerReportPage';
-import ManagerNoticePage from './components/pages/ManagerPages/ManagerNoticePage';
-import ManagerCalendarPage from './components/pages/ManagerPages/ManagerCalendarPage';
-import CoordinatorLayout from './components/layouts/CoordinatorLayout';
+
+// Coordinator Pages
 import CoordinatorDashboardPage from './components/pages/CoordinatorPages/CoordinatorDashboard';
 import CoordinatorProjectListPage from './components/pages/CoordinatorPages/CoordinatorProjectList';
 import SupervisorPage from './components/pages/PublicPages/SupervisorPage';
@@ -29,11 +43,17 @@ import CoordinatorNoticePage from './components/pages/CoordinatorPages/Coordinat
 import CoordinatorReportHomePage from './components/pages/CoordinatorPages/CoordinatorReportPage';
 import CoordinatorCalendarPage from './components/pages/CoordinatorPages/CoordinatorCalendarPage';
 import CoordinatorProfilePage from './components/pages/CoordinatorPages/CoordinatorProfilePage';
-import CoordinatorLogout from './components/pages/CoordinatorPages/CoordinatorLoginout';
-
+import LogoutPage from './components/pages/PublicPages/LogoutPage';
 
 const RouteConfigs = () => {
-  const element = useRoutes([
+  const routes = useRoutes([
+    // Public routes
+    { path: '/', element: <StartPage /> },
+    { path: '/login', element: <LoginPage /> },
+    { path: '/logincoordinator', element: <CoordinatorLoginPage /> },
+    { path: '/logout', element: <LogoutPage /> }, // Shared logout handler
+
+    // Manager routes
     {
       path: '/manager',
       element: <ProtectedRoute allowedRole="manager" />,
@@ -56,6 +76,7 @@ const RouteConfigs = () => {
       ],
     },
 
+    // Member routes
     {
       path: '/member',
       element: <ProtectedRoute allowedRole="member" />,
@@ -78,7 +99,8 @@ const RouteConfigs = () => {
       ],
     },
 
-     {
+    // Coordinator routes
+    {
       path: '/coordinator',
       element: <ProtectedRoute allowedRole="coordinator" />,
       children: [
@@ -94,14 +116,13 @@ const RouteConfigs = () => {
             { path: 'reports', element: <CoordinatorReportHomePage /> },
             { path: 'calendar', element: <CoordinatorCalendarPage /> },
             { path: 'profile', element: <CoordinatorProfilePage /> },
-            { path: 'logout', element: <CoordinatorLogout />}
           ],
         },
       ],
     },
-
   ]);
-  return element
+
+  return routes;
 };
 
 export default RouteConfigs;
