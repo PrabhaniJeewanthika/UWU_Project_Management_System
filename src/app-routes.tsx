@@ -10,7 +10,7 @@ import ManagerProjectListPage from './components/pages/ManagerPages/ManagerProje
 import ManagerProjectViewPage from './components/pages/ManagerPages/ManagerProjectViewPage';
 import ManagerTaskListPage from './components/pages/ManagerPages/ManagerTaskListPage';
 import ManagerTaskViewPage from './components/pages/ManagerPages/ManagerTaskViewPage';
-import CalendarPage from './components/pages/CalendarPage';
+import CalendarPage from './components/pages/PublicPages/CalendarPage';
 import NoticePage from './components/pages/PublicPages/NoticePage';
 import MemberProjectListPage from './components/pages/MemberPages/MemberProjectList';
 import MemberProjectViewPage from './components/pages/MemberPages/MemberProjectView';
@@ -20,10 +20,19 @@ import MemberReportHomePage from './components/pages/MemberPages/MemberReportHom
 import MemberCalendarPage from './components/pages/MemberPages/MemberCalendarPage';
 import ProfilePage from './components/pages/MemberPages/MemberProfilePage';
 import MemberNoticePage from './components/pages/MemberPages/MemberNoticePage';
+import StartPage from './components/pages/PublicPages/StartPage';
+import LoginPage from './components/pages/PublicPages/LoginPage';
+import CoordinatorLoginPage from './components/pages/PublicPages/CoordinatorLogin';
+import AuthPage from './components/pages/PublicPages/AuthPage';
 
 
 const RouteConfigs = () => {
   const element = useRoutes([
+    { path: '', element: <StartPage /> },
+    { path: '/login', element: <LoginPage /> },
+    { path: '/logincoordinator', element: <CoordinatorLoginPage /> },
+    { path: '/auth', element: <AuthPage /> },
+
     {
       path: '/manager',
       element: <ProtectedRoute allowedRole="manager" />,

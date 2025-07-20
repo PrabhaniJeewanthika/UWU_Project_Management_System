@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import loginImage from '../../assets/loginIllustration.png';
+import loginImage from '../../../assets/loginIllustration.png';
 
 const CoordinatorLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
