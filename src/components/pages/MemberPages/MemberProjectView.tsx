@@ -1,9 +1,7 @@
 import React from 'react';
 import { AppWindow, CheckCircle, Hourglass, Loader2, Circle } from 'lucide-react';
 import { useParams, useLocation } from 'react-router-dom';
-//import HomePageKanbanBoard from '..//HomePageKanbanBoard';
-
-
+import HomePageKanbanBoard from '../../ui/MemberUI/HomePageKanbanBoard';
 
 const MemberProjectViewPage = () => {
   const { id } = useParams();
