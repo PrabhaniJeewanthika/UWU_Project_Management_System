@@ -20,6 +20,7 @@ import MemberReportHomePage from './components/pages/MemberPages/MemberReportHom
 import MemberCalendarPage from './components/pages/MemberPages/MemberCalendarPage';
 import ProfilePage from './components/pages/MemberPages/MemberProfilePage';
 import MemberNoticePage from './components/pages/MemberPages/MemberNoticePage';
+import ManagerReportPage from './components/pages/ManagerPages/ManagerReportPage';
 
 
 const RouteConfigs = () => {
@@ -37,7 +38,7 @@ const RouteConfigs = () => {
             { path: 'projects/:id', element: <ManagerProjectViewPage /> },
             { path: 'tasks', element: <ManagerTaskListPage /> },
             { path: 'tasks/:id', element: <ManagerTaskViewPage /> },
-            { path: 'reports', element: "" },
+            { path: 'reports', element: <ManagerReportPage /> },
             { path: 'notices', element: <NoticePage /> },
             { path: 'calendar', element: <CalendarPage /> },
             { path: 'profile', element: <ManagerProfilePage /> },
