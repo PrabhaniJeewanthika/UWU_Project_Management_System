@@ -2,7 +2,7 @@ import React from 'react';
 import { FileText } from 'lucide-react';
 import { Box, Input } from '@chakra-ui/react';
 import { LuSearch } from "react-icons/lu";
-import Button from '../ui/Button';
+import Button from '../../ui/PublicUI/Button';
 
 const CoordinatorReportHomePage: React.FC = () => {
     const memberReports = [

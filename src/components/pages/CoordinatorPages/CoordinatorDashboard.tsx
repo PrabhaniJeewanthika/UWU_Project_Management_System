@@ -4,8 +4,8 @@ import { CalendarPlus } from 'lucide-react';
 
 import CalendarArea from '../../ui/PublicUI/CalendarArea';
 import SupervisorCard from '../../ui/PublicUI/SupervisorCard';
-import CoordinatorCalendarPage from './CoordinatorCalendarPage';
-import NewNoticeSection from '../ui/NewNoticeSection';
+//import CoordinatorCalendarPage from '../../ui/CoordinatorUI';
+//import NewNoticeSection from '../ui/NewNoticeSection';
 
 const CoordinatorDashboardPage = () => {
   const navigate = useNavigate();
