@@ -16,7 +16,7 @@ const allSupervisors = [
   { id: 3, name: 'Mr. D. Perera', email: 'd@uwu.ac.lk', position: 'Supervisor' },
 ];
 
-const ProjectListPage = () => {
+const CoordinatorProjectListPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [assignments, setAssignments] = useState<any[]>([]);
@@ -149,4 +149,4 @@ const ProjectListPage = () => {
   );
 };
 
-export default ProjectListPage;
+export default CoordinatorProjectListPage;

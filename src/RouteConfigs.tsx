@@ -8,18 +8,12 @@ import StartPage from '../src/components/pages/PublicPages/StartPage';
 
 import ManagerDashboard from '../src/components/pages/ManagerPages/ManagerDashboard';
 import MemberDashboard from '../src/components/pages/MemberPages/MemberDashboard';
+import CoordinatorDashboardPage from '../src/components/pages/CoordinatorPages/CoordinatorDashboard';
 
 import ManagerLayout from '../src/components/layouts/ManagerLayout';
 import MemberLayout from '../src/components/layouts/MemberLayout';
 import CoordinatorLayout from '../src/components/layouts/CoordinatorLayout';
 
-
-import CoordinatorNoticePage from '../src/components/pages/CoordinatorPages/CoordinatorNoticePage';
-import CoordinatorReportPage from '../src/components/pages/CoordinatorPages/CoordinatorReportPage';
-import CoordinatorCalendarPage from '../src/components/pages/CoordinatorPages/CoordinatorCalendarPage';
-import CoordinatorProfilePage from '../src/components/pages/CoordinatorPages/CoordinatorProfilePage';
-import SupervisorPage from '../src/components/pages/PublicPages/SupervisorPage';
-import CoordinatorDashboardPage from '../src/components/pages/CoordinatorPages/CoordinatorDashboard';
 
 const RouteConfigs = () => {
   const routes = useRoutes([

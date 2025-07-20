@@ -15,7 +15,7 @@ type EventType = {
     link?: string;
 };
 
-const CalendarPage: React.FC = () => {
+const CoordinatorCalendarPage: React.FC = () => {
     const [events, setEvents] = useState<EventType[]>([
         {
             id: '1',
@@ -227,4 +227,4 @@ const CalendarPage: React.FC = () => {
     );
 };
 
-export default CalendarPage;
+export default CoordinatorCalendarPage;

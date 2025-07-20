@@ -35,7 +35,7 @@ const initialNotices: Notice[] = [
     }
 ];
 
-const NoticePage = () => {
+const ManagerNoticePage = () => {
     const noticeModal = useDisclosure();
     const [notices, setNotices] = useState<Notice[]>(initialNotices);
 
@@ -99,4 +99,4 @@ const NoticeCard = ({ data, onMark }: { data: Notice; onMark: () => void }) => {
     );
 };
 
-export default NoticePage;
+export default ManagerNoticePage;
