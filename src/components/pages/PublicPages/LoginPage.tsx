@@ -247,8 +247,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-<<<<<<< HEAD
 export default LoginPage;
-=======
-export default AuthCombinedPage;
->>>>>>> cd89ad782f92d487dfe3b060a57b9e9e22c9e386
