@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import loginImage from '../../../assets/loginIllustration.png';
+import loginImage from '../../assets/loginIllustration.png';
 
-const AuthCombinedPage: React.FC = () => {
+const LoginPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -229,4 +229,4 @@ const AuthCombinedPage: React.FC = () => {
   );
 };
 
-export default AuthCombinedPage;
+export default LoginPage;
