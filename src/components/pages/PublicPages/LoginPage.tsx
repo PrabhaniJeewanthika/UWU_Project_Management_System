@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import loginImage from '../../../assets/loginIllustration.png';
+import loginImage from '../../../assets/loginIllustration.png'; // Make sure this path is correct
 
 const LoginPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
@@ -17,18 +17,25 @@ const LoginPage: React.FC = () => {
     /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd);
 
   const handleLogin = () => {
+    setMessage('');
     const isValidEmail =
       email.endsWith('@std.uwu.ac.lk') || email.endsWith('@uwu.ac.lk');
+
     if (!email || !password || !isValidEmail) {
       setMessage('Please use a valid university email to login.');
       return;
     }
-    localStorage.setItem('user', JSON.stringify({ email, role }));
-    localStorage.setItem('token', 'mock-token');
-    navigate(role === 'manager' ? '/manager' : '/member');
+
+    setLoading(true);
+    setTimeout(() => {
+      localStorage.setItem('user', JSON.stringify({ email, role }));
+      localStorage.setItem('token', 'mock-token');
+      setLoading(false);
+      navigate(role === 'manager' ? '/manager' : '/member');
+    }, 1000);
   };
 
-  const handleRegister = async () => {
+  const handleRegister = () => {
     setMessage('');
     if (!name || !email || !password || !confirmPassword) {
       setMessage('All fields are required.');
@@ -52,33 +59,21 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-      const response = await fetch('http://localhost/uwu_pms/api/register.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role }),
-      });
-
-      const result = await response.json();
-      setMessage(result.success ? 'Registration successful! Please login.' : result.message || 'Registration failed.');
-      if (result.success) {
-        setActiveTab('login');
-        setName('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setRole('member');
-      }
-    } catch {
-      setMessage('Server error. Please try again.');
-    } finally {
+    setLoading(true);
+    setTimeout(() => {
       setLoading(false);
-    }
+      setMessage('Registration successful! Please login.');
+      setActiveTab('login');
+      setName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setRole('member');
+    }, 1000);
   };
 
   return (
-    <div className={`w-screen h-screen flex items-center justify-center transition-all duration-300 ${activeTab === 'login' ? 'bg-cyan-100' : 'bg-green-100'} px-4`}>
+    <div className={`w-screen min-h-screen flex items-center justify-center transition-all duration-300 ${activeTab === 'login' ? 'bg-cyan-100' : 'bg-green-100'} px-4`}>
       <div className="w-full max-w-5xl h-auto flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl border border-gray-300 bg-white">
 
         {/* Image Section */}
@@ -118,7 +113,7 @@ const LoginPage: React.FC = () => {
 
           {activeTab === 'register' && (
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Name</label>
+              <label className="block text-sm font-medium mb-1">Full Name</label>
               <input
                 type="text"
                 placeholder="Enter your full name"
