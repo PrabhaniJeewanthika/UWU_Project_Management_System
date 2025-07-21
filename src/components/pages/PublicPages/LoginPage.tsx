@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import loginImage from '../../assets/loginIllustration.png';
+import loginImage from '../../../assets/loginIllustration.png';
 
 const LoginPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
@@ -13,42 +13,23 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const isPasswordStrong = (pwd: string) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd);
+  const isPasswordStrong = (pwd: string) =>
+    /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd);
 
-  const handleLogin = async () => {
-    setMessage('');
-    if (!email || !password || (!email.endsWith('@std.uwu.ac.lk') && !email.endsWith('@uwu.ac.lk'))) {
+  const handleLogin = () => {
+    const isValidEmail =
+      email.endsWith('@std.uwu.ac.lk') || email.endsWith('@uwu.ac.lk');
+    if (!email || !password || !isValidEmail) {
       setMessage('Please use a valid university email to login.');
       return;
     }
-
-    try {
-      setLoading(true);
-      const response = await fetch('http://localhost/PMS-Backd/api/login.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        localStorage.setItem('token', result.token);
-        localStorage.setItem('user', JSON.stringify(result.user));
-        navigate(result.user.role === 'manager' ? '/manager' : '/member');
-      } else {
-        setMessage(result.message || 'Login failed. Check your credentials.');
-      }
-    } catch (error) {
-      setMessage('Server error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    localStorage.setItem('user', JSON.stringify({ email, role }));
+    localStorage.setItem('token', 'mock-token');
+    navigate(role === 'manager' ? '/manager' : '/member');
   };
 
   const handleRegister = async () => {
     setMessage('');
-
     if (!name || !email || !password || !confirmPassword) {
       setMessage('All fields are required.');
       return;
@@ -60,7 +41,9 @@ const LoginPage: React.FC = () => {
     }
 
     if (!isPasswordStrong(password)) {
-      setMessage('Password must be at least 8 characters, include 1 uppercase letter and 1 number.');
+      setMessage(
+        'Password must be at least 8 characters, include 1 uppercase letter and 1 number.'
+      );
       return;
     }
 
@@ -71,24 +54,21 @@ const LoginPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost/PMS-Backd/api/register.php', {
+      const response = await fetch('http://localhost/uwu_pms/api/register.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role })
+        body: JSON.stringify({ name, email, password, role }),
       });
 
       const result = await response.json();
-
+      setMessage(result.success ? 'Registration successful! Please login.' : result.message || 'Registration failed.');
       if (result.success) {
-        setMessage('Registration successful! Please login.');
         setActiveTab('login');
         setName('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
         setRole('member');
-      } else {
-        setMessage(result.message || 'Registration failed.');
       }
     } catch {
       setMessage('Server error. Please try again.');
@@ -236,7 +216,9 @@ const LoginPage: React.FC = () => {
                 : 'Register'}
           </button>
 
-          {message && <p className="text-sm text-center text-red-600 mt-4">{message}</p>}
+          {message && (
+            <p className="text-sm text-center text-red-600 mt-4">{message}</p>
+          )}
 
           <p className="text-xs text-center mt-6 text-gray-500">
             © 2025 All Rights Reserved by IIT 16
