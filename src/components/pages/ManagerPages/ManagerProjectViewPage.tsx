@@ -1,9 +1,4 @@
-// Enhanced ManagerProjectViewPage.tsx with:
-// - Toast notifications
-// - Chakra-styled buttons
-// - Confirm update dialog
-// - React Hook Form for validation
-
+// Enhanced ManagerProjectViewPage.tsx with re-fetch after update
 import {
   AppWindow, CheckCircle, Hourglass, Loader2, Circle
 } from 'lucide-react';
@@ -18,7 +13,6 @@ import {
   Stack,
   Textarea,
   useDisclosure
-  // Removed useToast
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import HomePageKanbanBoard from '../../ui/PublicUI/HomepageKanbanBoard';
@@ -33,18 +27,19 @@ const ManagerProjectViewPage = () => {
   const [members, setMembers] = useState<any[]>([]);
   const [statusSummary, setStatusSummary] = useState<any>({});
 
-  const { register, handleSubmit, setValue, reset } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
+
+  const fetchProject = async () => {
+    const res = await fetch(`http://localhost/PMS-Backd/api/projects/view.php?id=${id}`);
+    const data = await res.json();
+    if (data.success) {
+      setProject(data.project);
+      setMembers(data.members);
+      setStatusSummary(data.status_summary);
+    }
+  };
 
   useEffect(() => {
-    const fetchProject = async () => {
-      const res = await fetch(`http://localhost/PMS-Backd/api/projects/view.php?id=${id}`);
-      const data = await res.json();
-      if (data.success) {
-        setProject(data.project);
-        setMembers(data.members);
-        setStatusSummary(data.status_summary);
-      }
-    };
     fetchProject();
   }, [id]);
 
@@ -84,7 +79,7 @@ const ManagerProjectViewPage = () => {
     if (result.success) {
       alert('Project updated.');
       editModal.onClose();
-      window.location.reload();
+      fetchProject(); // Re-fetch updated data
     } else {
       alert('Update failed.');
     }
