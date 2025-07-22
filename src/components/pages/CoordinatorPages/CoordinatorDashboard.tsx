@@ -2,10 +2,10 @@ import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { CalendarPlus } from 'lucide-react';
 
-import CalendarArea from '../../ui/PublicUI/CalendarArea';
-import SupervisorCard from '../../ui/PublicUI/SupervisorCard';
-//import CoordinatorCalendarPage from '../../ui/CoordinatorUI';
-//import NewNoticeSection from '../ui/NewNoticeSection';
+import CoordinatorCalendarPage from './CoordinatorCalendarPage';
+import NewNoticeSection from './NewNoticeSection';
+import CalendarArea from 'src/components/ui/PublicUI/CalendarArea';
+
 
 const CoordinatorDashboardPage = () => {
   const navigate = useNavigate();
@@ -28,12 +28,15 @@ const CoordinatorDashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
         <div className="lg:col-span-7 flex flex-col gap-6">
           <div>
+            
 
 
           </div>
           <div>
+            <NewNoticeSection />
          
           </div>
+          
         </div>
         <div className="lg:col-span-3 flex flex-col gap-6">
           <div>
