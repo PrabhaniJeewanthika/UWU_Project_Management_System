@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import loginImage from '../../../assets/loginIllustration.png'; // Make sure this path is correct
+import loginImage from '../../../assets/loginIllustration.png';
 
-const LoginPage: React.FC = () => {
+const AuthCombinedPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -13,30 +13,42 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const isPasswordStrong = (pwd: string) =>
-    /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd);
+  const isPasswordStrong = (pwd: string) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setMessage('');
-    const isValidEmail =
-      email.endsWith('@std.uwu.ac.lk') || email.endsWith('@uwu.ac.lk');
-
-    if (!email || !password || !isValidEmail) {
+    if (!email || !password || (!email.endsWith('@std.uwu.ac.lk') && !email.endsWith('@uwu.ac.lk'))) {
       setMessage('Please use a valid university email to login.');
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      localStorage.setItem('user', JSON.stringify({ email, role }));
-      localStorage.setItem('token', 'mock-token');
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost/PMS-Backd/api/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('user', JSON.stringify(result.user));
+        navigate(result.user.role === 'manager' ? '/manager' : '/member');
+      } else {
+        setMessage(result.message || 'Login failed. Check your credentials.');
+      }
+    } catch (error) {
+      setMessage('Server error. Please try again.');
+    } finally {
       setLoading(false);
-      navigate(role === 'manager' ? '/manager' : '/member');
-    }, 1000);
+    }
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     setMessage('');
+
     if (!name || !email || !password || !confirmPassword) {
       setMessage('All fields are required.');
       return;
@@ -48,9 +60,7 @@ const LoginPage: React.FC = () => {
     }
 
     if (!isPasswordStrong(password)) {
-      setMessage(
-        'Password must be at least 8 characters, include 1 uppercase letter and 1 number.'
-      );
+      setMessage('Password must be at least 8 characters, include 1 uppercase letter and 1 number.');
       return;
     }
 
@@ -59,21 +69,36 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost/PMS-Backd/api/register.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setMessage('Registration successful! Please login.');
+        setActiveTab('login');
+        setName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setRole('member');
+      } else {
+        setMessage(result.message || 'Registration failed.');
+      }
+    } catch {
+      setMessage('Server error. Please try again.');
+    } finally {
       setLoading(false);
-      setMessage('Registration successful! Please login.');
-      setActiveTab('login');
-      setName('');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
-      setRole('member');
-    }, 1000);
+    }
   };
 
   return (
-    <div className={`w-screen min-h-screen flex items-center justify-center transition-all duration-300 ${activeTab === 'login' ? 'bg-cyan-100' : 'bg-green-100'} px-4`}>
+    <div className={`w-screen h-screen flex items-center justify-center transition-all duration-300 ${activeTab === 'login' ? 'bg-cyan-100' : 'bg-green-100'} px-4`}>
       <div className="w-full max-w-5xl h-auto flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl border border-gray-300 bg-white">
 
         {/* Image Section */}
@@ -113,7 +138,7 @@ const LoginPage: React.FC = () => {
 
           {activeTab === 'register' && (
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Full Name</label>
+              <label className="block text-sm font-medium mb-1">Name</label>
               <input
                 type="text"
                 placeholder="Enter your full name"
@@ -211,9 +236,7 @@ const LoginPage: React.FC = () => {
                 : 'Register'}
           </button>
 
-          {message && (
-            <p className="text-sm text-center text-red-600 mt-4">{message}</p>
-          )}
+          {message && <p className="text-sm text-center text-red-600 mt-4">{message}</p>}
 
           <p className="text-xs text-center mt-6 text-gray-500">
             © 2025 All Rights Reserved by IIT 16
@@ -224,4 +247,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default AuthCombinedPage;
