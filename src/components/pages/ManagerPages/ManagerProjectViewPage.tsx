@@ -110,7 +110,6 @@ const ManagerProjectViewPage = () => {
         </div>
 
         <div className='flex gap-3'>
-          <Button colorScheme='teal'>Create Task</Button>
           <Button colorScheme='teal'>Add Member</Button>
           <Button colorScheme='blue' onClick={openEditForm}>Edit</Button>
           <Button colorScheme='red' onClick={handleDelete}>Delete</Button>

@@ -4,10 +4,10 @@
   "version": "1.0.2",
   "types": "./dist/index.d.mts",
   "scripts": {
-  "dev": "vite",
-  "build": "vite build",
-  "preview": "vite preview"
-},
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@chakra-ui/charts": "^3.20.0",
     "@chakra-ui/icons": "^2.2.4",
@@ -21,6 +21,7 @@
     "@fullcalendar/react": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17",
     "@hello-pangea/dnd": "^18.0.1",
+    "axios": "^1.10.0",
     "chart.js": "^4.4.9",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",

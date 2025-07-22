@@ -1,178 +1,151 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router';
-import { AppWindow, CheckCircle, Hourglass, Loader2, Circle, Trash2 } from 'lucide-react';
+import { LayoutList } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import Button from '../../ui/PublicUI/Button';
 
-const ManagerTaskViewPage = () => {
-  const { id } = useParams(); // Get task ID from the URL
+const ManagerTaskListPage = () => {
+  const [tasks, setTasks] = useState<any[]>([]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newStatus, setNewStatus] = useState('TODO');
 
-  // Local state to manage comments and input field
-  const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      timestamp: '2025-06-10 10:30AM',
-      author: 'K N P J Ananda',
-      message: 'Initial task assigned. Starting development soon.',
-    },
-    {
-      id: 2,
-      timestamp: '2025-06-11 03:15PM',
-      author: 'D G C Liyanage',
-      message: 'Reviewed the task plan and approved.',
-    },
-  ]);
-
-  // Add a new comment to the top of the list
-  const handleAddComment = () => {
-    if (!commentText.trim()) return;
-    const newComment = {
-      id: comments.length + 1,
-      timestamp: new Date().toLocaleString(),
-      author: 'You',
-      message: commentText,
-    };
-    setComments([newComment, ...comments]);
-    setCommentText('');
+  const fetchTasks = () => {
+    fetch(`http://localhost/PMS-Backd/api/tasks/get_by_project.php?project_id=${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setTasks(data.tasks);
+      });
   };
 
-  // Remove a comment by its ID
-  const handleRemoveComment = (id: number) => {
-    const updated = comments.filter((c) => c.id !== id);
-    setComments(updated);
-  };
+  useEffect(() => {
+    fetchTasks();
+  }, [id]);
 
-  // Render a styled badge based on task status
-  const getStatusBadge = (status: string) => {
-    const base = 'text-xs font-semibold rounded-full px-2 py-1 flex items-center gap-1';
-    switch (status) {
-      case 'TODO':
-        return (
-          <div className={`${base} bg-yellow-100 text-yellow-700`}>
-            <Hourglass size={14} />
-            To Do
-          </div>
-        );
-      case 'In Progress':
-        return (
-          <div className={`${base} bg-blue-100 text-blue-700`}>
-            <Loader2 size={14} className='animate-spin' />
-            In Progress
-          </div>
-        );
-      case 'Testing':
-        return (
-          <div className={`${base} bg-purple-100 text-purple-700`}>
-            <Circle size={14} />
-            Testing
-          </div>
-        );
-      case 'Done':
-        return (
-          <div className={`${base} bg-green-100 text-green-700`}>
-            <CheckCircle size={14} />
-            Done
-          </div>
-        );
-      default:
-        return (
-          <div className={`${base} bg-gray-100 text-gray-700`}>
-            <Circle size={14} />
-            Unknown
-          </div>
-        );
+  const handleCreateTask = async () => {
+    if (!newTitle.trim()) return;
+    const response = await fetch(`http://localhost/PMS-Backd/api/tasks/create.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_id: id,
+        title: newTitle,
+        status: newStatus
+      })
+    });
+    const result = await response.json();
+    if (result.success) {
+      fetchTasks();
+      setNewTitle('');
+      setNewStatus('TODO');
+      setIsDialogOpen(false);
     }
   };
 
   return (
     <div className='flex flex-col gap-6 pb-4'>
       <div className='flex justify-between'>
-        {/* Header with task title and actions */}
         <div>
           <div className='font-bold text-3xl flex gap-2 items-center'>
-            <AppWindow size={30} />
-            Task Name {id}
+            <LayoutList size={30} />
+            Tasks
           </div>
-          <div className='text text-xs text-gray-500'>Description Description Description</div>
+          <div className='text-xs text-gray-500'>View and manage all project tasks.</div>
         </div>
-        {/* Task control buttons (placeholders) */}
         <div className='flex gap-3'>
-          <Button>Edit Task</Button>
-          <Button>Delete Task</Button>
+          <Button onClick={() => setIsDialogOpen(true)}>New Task</Button>
         </div>
       </div>
 
-      {/* Left: task details, Right: comment input */}
-      <div className='grid grid-cols-2 gap-4'>
-        <div className='flex flex-col w-full border rounded-md'>
-          <TupleCardRow data={{ title: 'Description', value: 'Project Management System' }} />
-          <TupleCardRow data={{ title: 'Assigned Member', value: 'K N P J Ananda' }} />
-          <TupleCardRow data={{ title: 'Task Deadline', value: '06-06-2025' }} />
-          {/* Render status badge as component using `isComponent` flag */}
-          <TupleCardRow data={{ title: 'Current Status', value: getStatusBadge('TODO') }} isComponent />
-        </div>
-
-        {/* Comment input area */}
-        <div className='border rounded-md p-4 text-sm flex flex-col gap-2'>
-          <h2 className='text-base font-semibold'>Leave a Comment</h2>
-          <textarea
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            className='w-full border rounded-md p-2 text-sm resize-none'
-            rows={4}
-            placeholder='Write your comment here...'
-          />
-          <button
-            onClick={handleAddComment}
-            className='self-end px-4 py-1 text-xs font-semibold bg-gray-500 text-white rounded-md hover:bg-gray-600'
-          >
-            Submit Comment
-          </button>
-        </div>
-      </div>
-
-      {/* Render list of comments */}
-      <div className='flex flex-col gap-2'>
-        <h2 className='text-base font-semibold'>Comments</h2>
-        {comments.map((comment) => (
-          <div key={comment.id} className='bg-green-200 p-2 rounded-md flex justify-between items-start gap-4'>
-            <div className='flex-1'>
-              <div className='flex flex-col'>
-                <p className='text-xs font-bold'>{comment.timestamp}</p>
-                <p className='text-xs'>By: {comment.author}</p>
-              </div>
-              <div className='text-sm mt-2'>{comment.message}</div>
-            </div>
-            {/* Delete button for comment */}
-            <button
-              onClick={() => handleRemoveComment(comment.id)}
-              className='text-xs text-red-600 hover:text-red-800'
-              title="Delete comment"
-            >
-              <Trash2 size={16} />
-            </button>
-          </div>
+      <div className='flex flex-col gap-3'>
+        {tasks.map(task => (
+          <ListLine key={task.id} data={task} />
         ))}
       </div>
+
+      {isDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-md w-full max-w-md p-6 shadow-lg">
+            <h2 className='text-lg font-bold mb-4'>Create New Task</h2>
+            <div className='flex flex-col gap-3'>
+              <input
+                type='text'
+                className='border p-2 rounded w-full'
+                placeholder='Task Title'
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+              />
+              <select
+                className='border p-2 rounded w-full'
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+              >
+                <option value='TODO'>TODO</option>
+                <option value='In Progress'>In Progress</option>
+                <option value='Testing'>Testing</option>
+                <option value='Done'>Done</option>
+              </select>
+            </div>
+            <div className='flex justify-end gap-2 mt-6'>
+              <button
+                onClick={() => setIsDialogOpen(false)}
+                className='bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm'
+              >Cancel</button>
+              <button
+                onClick={handleCreateTask}
+                className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm'
+              >Create</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-// Reusable component to show title-value pairs
-// If value is a React component, `isComponent` flag allows rendering directly
-const TupleCardRow = ({
-  data,
-  isComponent = false,
-}: {
-  data: { title: string; value: any };
-  isComponent?: boolean;
-}) => {
+type TaskStatus = 'TODO' | 'In Progress' | 'Testing' | 'Done';
+
+interface Task {
+  id: number;
+  title: string;
+  status: TaskStatus;
+}
+
+const ListLine = ({ data }: { data: Task }) => {
+  const navigate = useNavigate();
+
+  const statusColor: Record<TaskStatus, string> = {
+    'TODO': 'bg-yellow-100 text-yellow-700',
+    'In Progress': 'bg-blue-100 text-blue-700',
+    'Testing': 'bg-purple-100 text-purple-700',
+    'Done': 'bg-green-100 text-green-700'
+  };
+
+  const statusDot: Record<TaskStatus, string> = {
+    'TODO': 'bg-yellow-500',
+    'In Progress': 'bg-blue-500',
+    'Testing': 'bg-purple-500',
+    'Done': 'bg-green-500'
+  };
+
   return (
-    <div className='w-full grid grid-cols-2 p-2 text-xs border-b'>
-      <div className='font-bold border-r'>{data.title}</div>
-      <div className='pl-1'>{isComponent ? data.value : <span>{data.value}</span>}</div>
+    <div
+      onClick={() => navigate(`/manager/tasks/${data.id}`)}
+      className='flex justify-between rounded-md bg-[#E8F5E9] p-2 cursor-pointer hover:bg-[#d0ebd8]'
+    >
+      <div>
+        <div className='font-bold text-xl'>{data.title}</div>
+        <div className='text-[10px] text-gray-600'>Task #{data.id}</div>
+      </div>
+      <div className='flex items-start gap-3'>
+        <div className={`flex items-center gap-1 ${statusColor[data.status]} text-[10px] font-bold px-2 py-1 rounded-md`}>
+          <span className={`w-2 h-2 rounded-full ${statusDot[data.status]}`}></span>
+          {data.status}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default ManagerTaskViewPage;
+export default ManagerTaskListPage;
