@@ -14,7 +14,7 @@ const ManagerDashboard = () => {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      navigate('/start');
+      //navigate('/start');
       return;
     }
 
