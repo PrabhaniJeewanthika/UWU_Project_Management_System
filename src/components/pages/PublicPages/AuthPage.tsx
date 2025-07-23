@@ -36,7 +36,7 @@ const AuthPage: React.FC = () => {
 
         try {
             setLoading(true);
-            const response = await fetch('http://localhost/uwu_pms/api/register.php', {
+            const response = await fetch('http://localhost/PMS-Backd/api/register.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password, role }),
