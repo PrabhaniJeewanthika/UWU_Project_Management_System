@@ -7,7 +7,7 @@ const CoordinatorLogout = () => {
   useEffect(() => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/logincoordinator');
+    navigate('/logincoordinator'); // Redirect to StartPage
   }, [navigate]);
 
   return null; 
