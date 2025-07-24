@@ -70,7 +70,7 @@ const RouteConfigs = () => {
             { path: 'projects', element: <ManagerProjectListPage /> },
             { path: 'projects/:id', element: <ManagerProjectViewPage /> },
             { path: 'tasks', element: <ManagerTaskListPage /> },
-            { path: 'tasks/:id', element: <ManagerTaskViewPage /> },
+            { path: "/manager/projects/:id/tasks", element: <ManagerTaskListPage />},
             { path: 'reports', element: <ManagerReportPage /> },
             { path: 'notices', element: <ManagerNoticePage /> },
             { path: 'calendar', element: <ManagerCalendarPage /> },

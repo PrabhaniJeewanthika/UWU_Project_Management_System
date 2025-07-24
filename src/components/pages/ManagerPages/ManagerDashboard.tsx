@@ -5,6 +5,8 @@ import clsx from 'clsx';
 import React, { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import HomePageKanbanBoard from "../../ui/PublicUI/HomepageKanbanBoard";
+import CalendarArea from "../../ui/PublicUI/CalendarArea";
+import Progress from "../../ui/PublicUI/Progress";
 
 // Main dashboard component for the Manager
 const ManagerDashboard = () => {
@@ -60,7 +62,8 @@ const ManagerDashboard = () => {
 
         {/* Sidebar section for additional widgets or tools */}
         <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-6">
-          {/* Future enhancements like notifications, reports etc. can go here */}
+          <CalendarArea />
+          <Progress />
         </div>
       </div>
     </div>

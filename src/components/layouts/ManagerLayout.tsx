@@ -1,5 +1,6 @@
 import { Box, Flex, HStack, Text, VStack } from '@chakra-ui/react';
 import React from 'react';
+
 import { Outlet } from 'react-router';
 import ManagerSidebar from '../ui/ManagerUI/ManagerSidebar';
 import Header from '../ui/PublicUI/Header';
@@ -19,4 +20,4 @@ const ManagerLayout = () => {
     );
 };
 
-export default ManagerLayout;
+export default ManagerLayout;
