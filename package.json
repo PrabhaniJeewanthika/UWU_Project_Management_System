@@ -11,7 +11,12 @@
   "dependencies": {
     "@chakra-ui/charts": "^3.20.0",
     "@chakra-ui/icons": "^2.2.4",
+    "@chakra-ui/layout": "^2.3.1",
+    "@chakra-ui/modal": "^2.3.1",
     "@chakra-ui/react": "^3.22.0",
+    "@chakra-ui/tag": "^3.1.1",
+    "@chakra-ui/toast": "^7.0.2",
+    "@chakra-ui/transition": "^2.1.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fullcalendar/core": "^6.1.17",

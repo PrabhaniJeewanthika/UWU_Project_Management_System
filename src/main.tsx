@@ -1,19 +1,24 @@
-// main.tsx or index.tsx
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { ChakraProvider } from '@chakra-ui/react';
-import { ThemeProvider } from 'next-themes';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App';
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
+import { ThemeProvider } from "next-themes"
+import React from "react"
+import ReactDOM from "react-dom/client"
+import { BrowserRouter, createBrowserRouter } from "react-router"
+import App from "./App"
+import RouteConfigs from "./app-routes"
+import ManagerLayout from "./components/layouts/ManagerLayout"
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const router = createBrowserRouter([
+  { path: "/app", Component: ManagerLayout },
+]);
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ChakraProvider>
-      <ThemeProvider attribute="class">
+    <ChakraProvider value={defaultSystem}>
+      <ThemeProvider attribute="class" disableTransitionOnChange>
         <BrowserRouter>
           <App />
         </BrowserRouter>
       </ThemeProvider>
     </ChakraProvider>
-  </React.StrictMode>
-);
+  </React.StrictMode>,
+)

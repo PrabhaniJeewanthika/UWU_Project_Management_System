@@ -7,6 +7,8 @@ import ProtectedRoute from './ProtectedRoute';
 import StartPage from './components/pages/PublicPages/StartPage';
 import LoginPage from './components/pages/PublicPages/LoginPage';
 import CoordinatorLoginPage from './components/pages/CoordinatorPages/CoordinatorLogin';
+import ResetPassword from './components/pages/PublicPages/ResetPassword';
+import ForgotPassword from './components/pages/PublicPages/ForgotPassword';
 
 // Layouts
 import ManagerLayout from './components/layouts/ManagerLayout';
@@ -51,7 +53,9 @@ const RouteConfigs = () => {
     { path: '/', element: <StartPage /> },
     { path: '/login', element: <LoginPage /> },
     { path: '/logincoordinator', element: <CoordinatorLoginPage /> },
-    { path: '/logout', element: <LogoutPage /> }, // Shared logout handler
+    { path: '/logout', element: <LogoutPage /> },
+    { path: '/forgot-password', element: <ForgotPassword /> },
+    { path: '/reset-password', element: <ResetPassword /> }, // Shared logout handler
 
     // Manager routes
     {
