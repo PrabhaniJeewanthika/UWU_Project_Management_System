@@ -38,9 +38,9 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "upload"
-          app_location: "/"             # Path to your app root
-          api_location: ""              # No Azure Functions
-          output_location: "dist"       # Vite output folder
+          app_location: "/"             # Root of your Vite project
+          api_location: ""              # No API backend
+          output_location: "dist"       # Output folder for Vite build
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
