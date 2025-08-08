@@ -10,6 +10,7 @@ const AuthCombinedPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState<'member' | 'manager'>('member');
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>(''); // NEW
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -17,8 +18,11 @@ const AuthCombinedPage: React.FC = () => {
 
   const handleLogin = async () => {
     setMessage('');
+    setMessageType('');
+
     if (!email || !password || (!email.endsWith('@std.uwu.ac.lk') && !email.endsWith('@uwu.ac.lk'))) {
       setMessage('Please use a valid university email to login.');
+      setMessageType('error');
       return;
     }
 
@@ -27,7 +31,7 @@ const AuthCombinedPage: React.FC = () => {
       const response = await fetch('http://localhost/new_backend/uwu_pms_backend/api/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // send/receive cookies
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
 
@@ -36,12 +40,16 @@ const AuthCombinedPage: React.FC = () => {
       if (result.success) {
         localStorage.setItem('token', result.token);
         localStorage.setItem('user', JSON.stringify(result.user));
+        setMessage('Login successful!');
+        setMessageType('success');
         navigate(result.user.role === 'manager' ? '/manager' : '/member');
       } else {
         setMessage(result.message || 'Login failed. Check your credentials.');
+        setMessageType('error');
       }
     } catch (error) {
       setMessage('Server error. Please try again.');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
@@ -49,24 +57,29 @@ const AuthCombinedPage: React.FC = () => {
 
   const handleRegister = async () => {
     setMessage('');
+    setMessageType('');
 
     if (!name || !email || !password || !confirmPassword) {
       setMessage('All fields are required.');
+      setMessageType('error');
       return;
     }
 
     if (!email.endsWith('@std.uwu.ac.lk') && !email.endsWith('@uwu.ac.lk')) {
       setMessage('Use a valid university email.');
+      setMessageType('error');
       return;
     }
 
     if (!isPasswordStrong(password)) {
       setMessage('Password must be at least 8 characters, include 1 uppercase letter and 1 number.');
+      setMessageType('error');
       return;
     }
 
     if (password !== confirmPassword) {
       setMessage('Passwords do not match.');
+      setMessageType('error');
       return;
     }
 
@@ -83,6 +96,7 @@ const AuthCombinedPage: React.FC = () => {
 
       if (result.success) {
         setMessage('Registration successful! Please login.');
+        setMessageType('success');
         setActiveTab('login');
         setName('');
         setEmail('');
@@ -91,14 +105,15 @@ const AuthCombinedPage: React.FC = () => {
         setRole('member');
       } else {
         setMessage(result.message || 'Registration failed.');
+        setMessageType('error');
       }
     } catch {
       setMessage('Server error. Please try again.');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className={`w-screen h-screen flex items-center justify-center transition-all duration-300 ${activeTab === 'login' ? 'bg-cyan-100' : 'bg-green-100'} px-4`}>
@@ -116,6 +131,7 @@ const AuthCombinedPage: React.FC = () => {
               onClick={() => {
                 setActiveTab('login');
                 setMessage('');
+                setMessageType('');
               }}
               className={`px-4 py-2 text-sm font-semibold rounded-l-md ${activeTab === 'login' ? 'bg-cyan-900 text-white' : 'bg-gray-200 text-gray-700'}`}
             >
@@ -125,6 +141,7 @@ const AuthCombinedPage: React.FC = () => {
               onClick={() => {
                 setActiveTab('register');
                 setMessage('');
+                setMessageType('');
               }}
               className={`px-4 py-2 text-sm font-semibold rounded-r-md ${activeTab === 'register' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}
             >
@@ -239,7 +256,16 @@ const AuthCombinedPage: React.FC = () => {
                 : 'Register'}
           </button>
 
-          {message && <p className="text-sm text-center text-red-600 mt-4">{message}</p>}
+          {/* Message with conditional color */}
+          {message && (
+            <p
+              className={`text-sm text-center mt-4 ${
+                messageType === 'success' ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
+              {message}
+            </p>
+          )}
 
           <p className="text-xs text-center mt-6 text-gray-500">
             © 2025 All Rights Reserved by IIT 16
