@@ -9,7 +9,7 @@ const CoordinatorLoginPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setSubmitted(true);
     setMessage('');
 
@@ -18,16 +18,30 @@ const CoordinatorLoginPage: React.FC = () => {
       return;
     }
 
-    const isValidEmail = email.endsWith('@uwu.ac.lk');
-    if (!isValidEmail) {
+    if (!email.endsWith('@uwu.ac.lk')) {
       setMessage('Please use a valid UWU coordinator email.');
       return;
     }
 
-    localStorage.setItem('user', JSON.stringify({ email, role: 'coordinator' }));
-    localStorage.setItem('token', 'mock-token');
-    navigate('/coordinator/dashboard');
+    try {
+      const res = await fetch('http://localhost/new_backend/uwu_pms_backend/api/coordinator/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // important for session cookies
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        navigate('/coordinator/dashboard');
+      } else {
+        setMessage(data.message || 'Login failed');
+      }
+    } catch (err) {
+      setMessage('Server error, please try again');
+    }
   };
+
 
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-cyan-100 px-4">

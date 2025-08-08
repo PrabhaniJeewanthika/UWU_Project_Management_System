@@ -24,9 +24,10 @@ const AuthCombinedPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost/PMS-Backd/api/login.php', {
+      const response = await fetch('http://localhost/new_backend/uwu_pms_backend/api/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // send/receive cookies
         body: JSON.stringify({ email, password })
       });
 
@@ -71,10 +72,11 @@ const AuthCombinedPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost/PMS-Backd/api/register.php', {
+      const response = await fetch('http://localhost/new_backend/uwu_pms_backend/api/register.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role })
+        credentials: 'include',
+        body: JSON.stringify({ name, email, password, role }),
       });
 
       const result = await response.json();
@@ -96,6 +98,7 @@ const AuthCombinedPage: React.FC = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className={`w-screen h-screen flex items-center justify-center transition-all duration-300 ${activeTab === 'login' ? 'bg-cyan-100' : 'bg-green-100'} px-4`}>
