@@ -28,7 +28,7 @@ const AuthCombinedPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost/new_backend/uwu_pms_backend/api/login.php', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/login.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -85,7 +85,7 @@ const AuthCombinedPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost/new_backend/uwu_pms_backend/api/register.php', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/register.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -115,10 +115,31 @@ const AuthCombinedPage: React.FC = () => {
     }
   };
 
+  // const onClick = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/sample.php`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       credentials: 'include',
+  //       body: JSON.stringify({ "name": "dinesh" }),
+  //     });
+
+  //     const result = await response.json();
+
+  //     alert(JSON.stringify(result));
+  //   } catch {
+  //     setMessage('Server error. Please try again.');
+  //     setMessageType('error');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
   return (
     <div className={`w-screen h-screen flex items-center justify-center transition-all duration-300 ${activeTab === 'login' ? 'bg-cyan-100' : 'bg-green-100'} px-4`}>
       <div className="w-full max-w-5xl h-auto flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl border border-gray-300 bg-white">
-
+        {/* <button onClick={onClick}>Click me</button> */}
         {/* Image Section */}
         <div className={`w-full md:w-1/2 ${activeTab === 'login' ? 'bg-cyan-50' : 'bg-green-50'} flex items-center justify-center p-4`}>
           <img src={loginImage} alt="Login Illustration" className="object-contain w-[90%] max-h-[360px]" />
