@@ -8,7 +8,7 @@ import Progress from "../../ui/PublicUI/Progress";
 
 type Project = { id: number; name: string };
 
-const API_BASE = "http://localhost/new_backend/uwu_pms_backend";
+//const API_BASE = "http://localhost/new_backend/uwu_pms_backend";
 
 const ManagerDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const ManagerDashboard: React.FC = () => {
     const run = async () => {
       try {
         // 1) Check auth & role via PHP session/cookie
-        const authRes = await fetch(`${API_BASE}/api/manager/auth-check.php`, {
+        const authRes = await fetch(`${import.meta.env.VITE_BASE_URL}/api/manager/auth-check.php`, {
           method: "GET",
           credentials: "include", // sends session + cookies
         });
@@ -32,7 +32,7 @@ const ManagerDashboard: React.FC = () => {
         if (!authJson.success) throw new Error("Unauthorized");
 
         // 2) Load manager stats
-        const statsRes = await fetch(`${API_BASE}/api/manager/stats.php`, {
+        const statsRes = await fetch(`${import.meta.env.VITE_BASE_URL}/api/manager/stats.php`, {
           method: "GET",
           credentials: "include",
         });
