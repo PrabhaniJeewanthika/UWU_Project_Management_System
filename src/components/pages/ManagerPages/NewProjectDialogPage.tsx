@@ -8,7 +8,7 @@ import {
   Textarea,
   UseDisclosureProps
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type NewProjectDialogPageProps = {
   disclosure: UseDisclosureProps;
@@ -19,26 +19,43 @@ const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialog
   const ref = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [err, setErr] = useState('');
 
-  const manager_id = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+  // focus title when dialog opens
+  useEffect(() => {
+    if (disclosure.open) {
+      setTimeout(() => ref.current?.focus(), 50);
+    } else {
+      setTitle('');
+      setDesc('');
+      setErr('');
+    }
+  }, [disclosure.open]);
 
   const handleCreate = async () => {
-    if (!title.trim() || !manager_id) return;
-    setLoading(true);
+    const t = title.trim();
+    if (!t) { setErr('Project title is required'); return; }
+    setErr('');
+    setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost/PMS-Backd/api/projects/create.php', {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/manager/projects/create.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          description: desc,
-          manager_id
-        })
+        credentials: 'include', // send session cookies
+        body: JSON.stringify({ title: t, description: desc.trim() || null })
       });
 
-      const result = await response.json();
+      // Read as text first to catch HTML error pages
+      const text = await res.text();
+      let result: any;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        console.error('Non-JSON response from API (create project):\n', text);
+        throw new Error('API did not return JSON');
+      }
 
       if (result.success) {
         setTitle('');
@@ -46,15 +63,17 @@ const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialog
         disclosure.onClose?.();
         onProjectCreated();
       } else {
-        alert(result.message || 'Failed to create project.');
+        setErr(result.message || 'Failed to create project.');
       }
     } catch (e) {
-      console.error('Error:', e);
-      alert('Server error while creating project.');
+      console.error('Create project error:', e);
+      setErr('Server error while creating project.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
+
+  const canSave = title.trim().length > 0 && !isLoading;
 
   return (
     <div>
@@ -89,6 +108,10 @@ const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialog
                       onChange={(e) => setDesc(e.target.value)}
                     />
                   </Field.Root>
+
+                  {err && (
+                    <div className="text-sm text-red-600">{err}</div>
+                  )}
                 </Stack>
               </Dialog.Body>
 
@@ -96,7 +119,12 @@ const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialog
                 <Dialog.ActionTrigger asChild>
                   <Button variant="outline">Cancel</Button>
                 </Dialog.ActionTrigger>
-                <Button onClick={handleCreate} loading={loading} colorScheme="green">
+                <Button
+                  onClick={handleCreate}
+                  loading={isLoading}      // ✅ use `loading`
+                  disabled={!canSave}
+                  colorScheme="green"
+                >
                   Save
                 </Button>
               </Dialog.Footer>

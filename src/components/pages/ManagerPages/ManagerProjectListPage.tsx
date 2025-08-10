@@ -10,14 +10,22 @@ const isProjectManager = true;
 const ManagerProjectListPage = () => {
   const newProjectDialog = useDisclosure();
   const [projects, setProjects] = useState<any[]>([]);
-  const manager = JSON.parse(localStorage.getItem('user') || '{}');
-  const managerId = manager?.id;
 
   const loadProjects = async () => {
-    const res = await fetch(`http://localhost/PMS-Backd/api/projects/get_all.php?manager_id=${managerId}`);
-    const data = await res.json();
-    if (data.success) setProjects(data.projects);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/manager/projects/list.php`, // ✅ backend API
+        {
+          credentials: 'include', // ✅ send cookies/session
+        }
+      );
+      const data = await res.json();
+      if (data.success) setProjects(data.projects);
+    } catch (err) {
+      console.error('Error loading projects:', err);
+    }
   };
+
 
   useEffect(() => {
     loadProjects();
