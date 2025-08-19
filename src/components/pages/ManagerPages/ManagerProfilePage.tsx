@@ -1,8 +1,9 @@
+// src/pages/manager/ManagerProfilePage.tsx
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Box,
-  Button,
+  Button as CButton, // avoid name clash with your custom Button if needed
   Heading,
   Input,
   Textarea,
@@ -11,18 +12,19 @@ import {
 import {
   Lock,
   Mail,
-  User,
+  User as UserIcon,
   Upload,
   Camera,
   GraduationCap,
   Info,
 } from 'lucide-react';
+import { getAuth } from '../../../lib/api';
 
 type FormData = {
   name: string;
   email: string;
   password: string;
-  academicYear: string;
+  academicYear: string;   // frontend field
   bio: string;
   profileImage: FileList;
 };
@@ -30,19 +32,23 @@ type FormData = {
 const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
 const ManagerProfilePage: React.FC = () => {
-  const { register, handleSubmit, watch, getValues } = useForm<FormData>({
+  const { register, handleSubmit, watch, getValues, reset, setValue } = useForm<FormData>({
     defaultValues: {
-      name: 'K N P J Ananda',
-      email: 'iit22049@std.uwu.ac.lk',
+      name: '',
+      email: '',
       password: '',
-      academicYear: '2nd Year',
-      bio: 'I am a 2nd year student at UWU.',
+      academicYear: '',
+      bio: '',
     },
   });
 
   const [imagePreview, setImagePreview] = useState<string>('https://i.pravatar.cc/300?u=preview');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [err, setErr] = useState<string>('');
   const profileImage = watch('profileImage');
 
+  // Local-only preview (backend doesn’t accept images here)
   useEffect(() => {
     if (profileImage && profileImage.length > 0) {
       const file = profileImage[0];
@@ -52,21 +58,119 @@ const ManagerProfilePage: React.FC = () => {
     }
   }, [profileImage]);
 
-  const onSubmit = (data: FormData) => {
-    console.log('Updated profile:', data);
+  // ---- Load current profile from backend ----
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setLoading(true);
+      setErr('');
+      try {
+        const auth = getAuth();
+        const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/profile.php?action=view`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
+            },
+            credentials: 'include',
+          }
+        );
+        const text = await res.text();
+        let data: any;
+        try { data = JSON.parse(text); } catch { throw new Error('API did not return JSON'); }
+        if (!res.ok || !data?.success) throw new Error(data?.message || `Load failed (HTTP ${res.status})`);
+
+        const p = data.profile || {};
+        if (!alive) return;
+
+        // map backend -> form fields
+        reset({
+          name: p.name || '',
+          email: p.email || '',
+          password: '',
+          academicYear: p.academic_year || '',
+          bio: p.bio || '',
+        });
+
+        // optional: set avatar fallback deterministic by user id/email
+        if (p.email) setImagePreview(`https://i.pravatar.cc/300?u=${encodeURIComponent(p.email)}`);
+      } catch (e: any) {
+        if (alive) setErr(e?.message || 'Failed to load profile');
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [reset]);
+
+  // ---- Submit update to backend ----
+  const onSubmit = async (data: FormData) => {
+    try {
+      setSaving(true);
+      setErr('');
+
+      const auth = getAuth();
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/profile.php?action=update`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: data.name || null,
+            email: data.email || null,
+            password: data.password || null,
+            academic_year: data.academicYear || null, // backend expects academic_year
+            bio: data.bio || null,
+          }),
+        }
+      );
+      const text = await res.text();
+      let result: any;
+      try { result = JSON.parse(text); } catch { throw new Error('API did not return JSON'); }
+      if (!res.ok || !result?.success) throw new Error(result?.message || `Update failed (HTTP ${res.status})`);
+
+      // Refresh form with returned profile
+      const p = result.profile || {};
+      reset({
+        name: p.name || '',
+        email: p.email || '',
+        password: '',
+        academicYear: p.academic_year || '',
+        bio: p.bio || '',
+      });
+
+      // keep preview as-is; server doesn’t change it
+      alert('Profile updated successfully.');
+    } catch (e: any) {
+      setErr(e?.message || 'Server error while updating profile.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="flex flex-col gap-6 pb-4">
       <div className="flex flex-col">
         <div className="font-bold text-3xl flex gap-2 items-center">
-          <User size={30} />
+          <UserIcon size={30} />
           My Profile
         </div>
         <div className="text-xs text-gray-600 ml-8 mt-1">
           Keep your profile up-to-date and personalize your workspace
         </div>
       </div>
+
+      {/* error line (no style changes elsewhere) */}
+      {err && (
+        <div className="text-sm text-red-600 border border-red-300 rounded p-2">{err}</div>
+      )}
+
       <div className="flex border rounded-md overflow-hidden">
         <div className="w-1/3 p-6 bg-white border-r">
           <Heading size="md" fontFamily="Roboto" mb={4}>Profile Details</Heading>
@@ -110,21 +214,24 @@ const ManagerProfilePage: React.FC = () => {
             </div>
           </div>
         </div>
+
         <div className="w-2/3 p-6 bg-gray-50">
           <Heading size="md" fontFamily="Roboto" mb={4}>Update Profile</Heading>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <Text className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                <User size={14} /> Full Name
+                <UserIcon size={14} /> Full Name
               </Text>
-              <Input {...register('name')} size="sm" />
+              <Input {...register('name')} size="sm" disabled={loading || saving} />
             </div>
+
             <div className="flex flex-col gap-1">
               <Text className="text-sm font-medium text-gray-700 flex items-center gap-1">
                 <Mail size={14} /> Email
               </Text>
-              <Input {...register('email')} type="email" size="sm" />
+              <Input {...register('email')} type="email" size="sm" disabled={loading || saving} />
             </div>
+
             <div className="flex flex-col gap-1">
               <Text className="text-sm font-medium text-gray-700 flex items-center gap-1">
                 <GraduationCap size={14} /> Academic Year
@@ -132,36 +239,42 @@ const ManagerProfilePage: React.FC = () => {
               <select
                 {...register('academicYear')}
                 className="border border-gray-300 rounded px-3 py-1 text-sm"
+                disabled={loading || saving}
               >
                 {academicYears.map((year) => (
                   <option key={year} value={year}>{year}</option>
                 ))}
               </select>
             </div>
+
             <div className="flex flex-col gap-1">
               <Text className="text-sm font-medium text-gray-700 flex items-center gap-1">
                 <Info size={14} /> Bio
               </Text>
-              <Textarea {...register('bio')} placeholder="Tell us about yourself..." size="sm" />
+              <Textarea {...register('bio')} placeholder="Tell us about yourself..." size="sm" disabled={loading || saving} />
             </div>
+
             <div className="flex flex-col gap-1">
               <Text className="text-sm font-medium text-gray-700 flex items-center gap-1">
                 <Lock size={14} /> Password
               </Text>
-              <Input {...register('password')} type="password" placeholder="********" size="sm" />
+              <Input {...register('password')} type="password" placeholder="********" size="sm" disabled={loading || saving} />
+              <span className="text-[11px] text-gray-500">Leave blank to keep your current password.</span>
             </div>
-            <Button
+
+            <CButton
               type="submit"
               size="sm"
               borderRadius="md"
-              arrow-back={<Upload size={16} />}
               bg="gray.500"
               color="white"
               _hover={{ bg: 'gray.600' }}
               fontFamily="Roboto"
+              disabled={loading || saving}
             >
-              Update Profile
-            </Button>
+              <Upload size={16} style={{ marginRight: '8px' }} />
+              {saving ? 'Updating…' : 'Update Profile'}
+            </CButton>
           </form>
         </div>
       </div>

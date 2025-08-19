@@ -17,37 +17,60 @@ type NewProjectDialogPageProps = {
 
 const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialogPageProps) => {
   const ref = useRef<HTMLInputElement>(null);
+
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
+  const [startDate, setStartDate] = useState(''); // YYYY-MM-DD
+  const [endDate, setEndDate] = useState('');     // YYYY-MM-DD
+
   const [isLoading, setIsLoading] = useState(false);
   const [err, setErr] = useState('');
 
-  // focus title when dialog opens
+  // focus title when dialog opens + reset fields when closing
   useEffect(() => {
     if (disclosure.open) {
       setTimeout(() => ref.current?.focus(), 50);
     } else {
       setTitle('');
       setDesc('');
+      setStartDate('');
+      setEndDate('');
       setErr('');
     }
   }, [disclosure.open]);
 
-  const handleCreate = async () => {
+  const validate = () => {
     const t = title.trim();
-    if (!t) { setErr('Project title is required'); return; }
+    if (!t) return 'Project title is required';
+    if (!startDate) return 'Start date is required';
+    if (!endDate) return 'End date is required';
+    if (new Date(startDate) > new Date(endDate)) return 'End date must be on or after the start date';
+    return '';
+  };
+
+  const handleCreate = async () => {
+    const v = validate();
+    if (v) { setErr(v); return; }
+
     setErr('');
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/manager/projects/create.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // send session cookies
-        body: JSON.stringify({ title: t, description: desc.trim() || null })
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/manager/projects/create.php`, // ✅ point to create.php
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            title: title.trim(),
+            description: desc.trim() || null,
+            start_date: startDate,
+            end_date: endDate
+          })
+        }
+      );
 
-      // Read as text first to catch HTML error pages
       const text = await res.text();
       let result: any;
       try {
@@ -60,6 +83,8 @@ const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialog
       if (result.success) {
         setTitle('');
         setDesc('');
+        setStartDate('');
+        setEndDate('');
         disclosure.onClose?.();
         onProjectCreated();
       } else {
@@ -73,7 +98,8 @@ const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialog
     }
   };
 
-  const canSave = title.trim().length > 0 && !isLoading;
+  const datesValid = startDate && endDate && new Date(startDate) <= new Date(endDate);
+  const canSave = title.trim().length > 0 && datesValid && !isLoading;
 
   return (
     <div>
@@ -109,6 +135,27 @@ const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialog
                     />
                   </Field.Root>
 
+                  <Field.Root>
+                    <Field.Label>Start Date</Field.Label>
+                    <Input
+                      type="date"
+                      className="border pl-2"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                  </Field.Root>
+
+                  <Field.Root>
+                    <Field.Label>End Date</Field.Label>
+                    <Input
+                      type="date"
+                      className="border pl-2"
+                      value={endDate}
+                      min={startDate || undefined}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                  </Field.Root>
+
                   {err && (
                     <div className="text-sm text-red-600">{err}</div>
                   )}
@@ -121,7 +168,7 @@ const NewProjectDialogPage = ({ disclosure, onProjectCreated }: NewProjectDialog
                 </Dialog.ActionTrigger>
                 <Button
                   onClick={handleCreate}
-                  loading={isLoading}      // ✅ use `loading`
+                  loading={isLoading}      // keep `loading` to match your setup
                   disabled={!canSave}
                   colorScheme="green"
                 >

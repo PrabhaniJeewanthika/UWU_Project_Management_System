@@ -1,77 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import { Fade } from "@chakra-ui/transition";
-import { useToast } from '@chakra-ui/toast';
-import {
-    Box,
-    Heading,
-    Text,
-    SimpleGrid,
-    Badge,
-    Stack,
-} from '@chakra-ui/react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { Bell, EyeOff, CheckCircle } from 'lucide-react';
+import { useDisclosure } from '@chakra-ui/react';
+import Button from '../../ui/PublicUI/Button';
+
 
 type Notice = {
-    id: string;
+    id: number;
     title: string;
-    description: string;
-    time: string;
+    content: string;
+    timeAgo: string;
+    isNew: boolean;
 };
 
-const ManagerNoticePage: React.FC = () => {
-    const [notices, setNotices] = useState<Notice[]>([]);
-    const toast = useToast();
-    const noticeApiUrl = 'http://localhost/api/public/notice_api.php';
+const initialNotices: Notice[] = [
+    {
+        id: 1,
+        title: 'Test Notice',
+        content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque quos, consequuntur sequi vel...',
+        timeAgo: '1 week ago',
+        isNew: true
+    },
+    {
+        id: 2,
+        title: 'Deadline Reminder',
+        content: 'Your project deadline is in 2 days. Please update your progress status.',
+        timeAgo: '3 days ago',
+        isNew: true
+    },
+    {
+        id: 3,
+        title: 'Meeting Scheduled',
+        content: 'A team meeting is scheduled for Friday at 10AM via Zoom.',
+        timeAgo: '2 days ago',
+        isNew: false
+    }
+];
 
-    useEffect(() => {
-        fetchNotices();
-    }, []);
+const ManagerNoticePage = () => {
+    const noticeModal = useDisclosure();
+    const [notices, setNotices] = useState<Notice[]>(initialNotices);
 
-    const fetchNotices = async () => {
-        try {
-            const res = await axios.get<Notice[] | any>(noticeApiUrl);
-            setNotices(Array.isArray(res.data) ? res.data : []);
-        } catch (error) {
-            toast({ title: 'Failed to load notices.', status: 'error' });
-        }
+    const markAsRead = (id: number) => {
+        setNotices((prev) =>
+            prev.map((n) =>
+                n.id === id ? { ...n, isNew: false } : n
+            )
+        );
     };
 
     return (
-        <div className="flex flex-col gap-6 pb-4">
-            <Heading mb={6} color="teal.700">
-                All Notices
-            </Heading>
-
-            <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap={6}>
-                {notices.map((notice) => (
-                    <Fade in key={notice.id}>
-                        <Box
-                            p={4}
-                            bg="white"
-                            borderRadius="lg"
-                            boxShadow="md"
-                            _hover={{
-                                boxShadow: 'lg',
-                                transform: 'translateY(-4px)',
-                                transition: '0.2s',
-                            }}
-                        >
-                            <Stack gap={2}>
-                                <Text fontWeight="bold" fontSize="lg">
-                                    {notice.title}
-                                </Text>
-                                <Text fontSize="sm" color="gray.700">
-                                    {notice.description}
-                                </Text>
-                                <Badge colorScheme="purple" fontSize="0.75em" alignSelf="flex-start">
-                                    {new Date(notice.time).toLocaleString()}
-                                </Badge>
-                            </Stack>
-                        </Box>
-                    </Fade>
+        <div className='flex flex-col gap-6 pb-4'>
+            <div className='flex justify-between'>
+                <div>
+                    <div className='font-bold text-3xl flex gap-2 items-center'>
+                        <Bell size={30} />
+                        Notices
+                    </div>
+                    <div className='text text-xs'>Stay updated with the latest announcements and reminders</div>
+                </div>
+                <div className='flex gap-3'>
+                    
+                </div>
+            </div>
+            <div className='flex flex-col gap-3'>
+                {notices.map((note) => (
+                    <NoticeCard key={note.id} data={note} onMark={() => markAsRead(note.id)} />
                 ))}
-            </SimpleGrid>
+            </div>
+        </div>
+    );
+};
 
+const NoticeCard = ({ data, onMark }: { data: Notice; onMark: () => void }) => {
+    return (
+        <div className='bg-gray-100 hover:bg-gray-200 p-4 rounded-md shadow-sm transition-all duration-200 relative'>
+            <div className='absolute top-2 right-4 flex items-center text-xs text-gray-500 gap-1'>
+                <EyeOff size={16} strokeWidth={1.5} />
+                <span>{data.timeAgo}</span>
+            </div>
+            <div className='flex items-center gap-2'>
+                <p className='font-bold text-gray-800 text-base'>{data.title}</p>
+                {data.isNew && (
+                    <span className='bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium'>
+                        New
+                    </span>
+                )}
+            </div>
+            <p className='text-xs text-gray-700 mt-1'>{data.content}</p>
+            {data.isNew && (
+                <div
+                    onClick={onMark}
+                    className='flex items-center justify-end text-xs text-gray-900 hover mt-2 cursor-pointer gap-1'
+                >
+                    <CheckCircle size={14} />
+                    Mark as read
+                </div>
+            )}
         </div>
     );
 };

@@ -1,46 +1,135 @@
+// src/pages/manager/ManagerTaskListPage.tsx
 import { LayoutList } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import Button from '../../ui/PublicUI/Button';
+import { getAuth } from '../../../lib/api';
+
+type TaskStatus = 'TODO' | 'In Progress' | 'Testing' | 'Done';
+
+interface TaskData {
+  id: number;
+  title: string;
+  status: TaskStatus;
+}
+
+// API <-> UI status mapping
+const uiToApi: Record<TaskStatus, string> = {
+  'TODO': 'todo',
+  'In Progress': 'in_progress',
+  'Testing': 'testing',
+  'Done': 'done',
+};
+const apiToUi = (s: string): TaskStatus => {
+  const map: Record<string, TaskStatus> = {
+    'todo': 'TODO',
+    'in_progress': 'In Progress',
+    'testing': 'Testing',
+    'done': 'Done',
+  };
+  return map[s] ?? 'TODO';
+};
 
 const ManagerTaskListPage = () => {
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<TaskData[]>([]);
   const { id } = useParams(); // project_id from URL
   const navigate = useNavigate();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
-  const [newStatus, setNewStatus] = useState('TODO');
+  const [newStatus, setNewStatus] = useState<TaskStatus>('TODO');
+  const [loading, setLoading] = useState(false);
 
+  // ---- Load tasks for the project ----
   useEffect(() => {
-    fetch(`http://localhost/PMS-Backd/api/tasks/get_by_project.php?project_id=${id}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setTasks(data.tasks);
-      });
+    let alive = true;
+    const load = async () => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        const auth = getAuth();
+        const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/manager/tasks.php?action=list&project_id=${encodeURIComponent(id)}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
+            },
+            credentials: 'include',
+          }
+        );
+        const text = await res.text();
+        let data: any;
+        try { data = JSON.parse(text); } catch { throw new Error('API did not return JSON'); }
+        if (!res.ok || !data?.success) throw new Error(data?.message || `Load failed (HTTP ${res.status})`);
+
+        if (!alive) return;
+        const list: TaskData[] = (data.tasks ?? []).map((t: any) => ({
+          id: Number(t.id),
+          title: String(t.title ?? ''),
+          status: apiToUi(String(t.status ?? 'todo')),
+        }));
+        setTasks(list);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    };
+    load();
+    return () => { alive = false; };
   }, [id]);
 
+  // ---- Create task ----
   const handleCreateTask = async () => {
-    if (!newTitle.trim()) return;
-    const response = await fetch(`http://localhost/PMS-Backd/api/tasks/create.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        project_id: id,
-        title: newTitle,
-        status: newStatus
-      })
-    });
-    const result = await response.json();
-    if (result.success) {
+    if (!id) return;
+    if (!newTitle.trim()) { alert('Title is required'); return; }
+
+    try {
+      const auth = getAuth();
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/manager/tasks.php?action=create`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            project_id: Number(id),
+            title: newTitle.trim(),
+            status: uiToApi[newStatus], // backend expects snake/lower
+          }),
+        }
+      );
+      const text = await res.text();
+      let data: any;
+      try { data = JSON.parse(text); } catch { throw new Error('API did not return JSON'); }
+      if (!res.ok || !data?.success) throw new Error(data?.message || `Create failed (HTTP ${res.status})`);
+
+      // Option A: push to list (fast)
+      if (data.task) {
+        const t = data.task;
+        const newTask: TaskData = {
+          id: Number(t.id),
+          title: String(t.title ?? newTitle),
+          status: apiToUi(String(t.status ?? uiToApi[newStatus])),
+        };
+        setTasks(prev => [newTask, ...prev]);
+      } else {
+        // Option B: refetch list (fallback)
+        // (Keep this minimal to avoid UI changes)
+      }
+
+      // reset/close
       setNewTitle('');
       setNewStatus('TODO');
       setIsDialogOpen(false);
-      fetch(`http://localhost/PMS-Backd/api/tasks/get_by_project.php?project_id=${id}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) setTasks(data.tasks);
-        });
+    } catch (e: any) {
+      console.error(e);
+      alert(e?.message || 'Server error while creating task.');
     }
   };
 
@@ -61,9 +150,13 @@ const ManagerTaskListPage = () => {
       </div>
 
       <div className='flex flex-col gap-3'>
-        {tasks.map(task => (
+        {loading && <div className='text-xs text-gray-600'>Loading…</div>}
+        {!loading && tasks.map(task => (
           <ListLine key={task.id} data={task} />
         ))}
+        {!loading && tasks.length === 0 && (
+          <div className='text-xs text-gray-600'>No tasks yet.</div>
+        )}
       </div>
 
       {isDialogOpen && (
@@ -81,7 +174,7 @@ const ManagerTaskListPage = () => {
               <select
                 className='border p-2 rounded w-full'
                 value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
+                onChange={(e) => setNewStatus(e.target.value as TaskStatus)}
               >
                 <option value='TODO'>TODO</option>
                 <option value='In Progress'>In Progress</option>
@@ -94,10 +187,7 @@ const ManagerTaskListPage = () => {
                 onClick={() => setIsDialogOpen(false)}
                 className='bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm'
               >Cancel</button>
-              <button
-                onClick={handleCreateTask}
-                className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm'
-              >Create</button>
+              <button onClick={handleCreateTask}>Create</button>
             </div>
           </div>
         </div>
@@ -105,14 +195,6 @@ const ManagerTaskListPage = () => {
     </div>
   );
 };
-
-type TaskStatus = 'TODO' | 'In Progress' | 'Testing' | 'Done';
-
-interface TaskData {
-  id: number;
-  title: string;
-  status: TaskStatus;
-}
 
 const ListLine = ({ data }: { data: TaskData }) => {
   const navigate = useNavigate();

@@ -39,16 +39,16 @@ const menuItems = [
     link: "calendar",
     icon: <CalendarDays size={15} />
   },
-  {
-    title: "Reports",
-    link: "reports",
-    icon: <FileText size={15} />
-  },
-  {
-    title: "Profile",
-    link: "profile",
-    icon: <User size={15} />
-  },
+  // {
+  //   title: "Reports",
+  //   link: "reports",
+  //   icon: <FileText size={15} />
+  // },
+  // {
+  //   title: "Profile",
+  //   link: "profile",
+  //   icon: <User size={15} />
+  // },
 ];
 
 const CoordinatorSidebar = () => {

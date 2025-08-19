@@ -24,12 +24,17 @@ const CoordinatorLoginPage: React.FC = () => {
     }
 
     try {
-      const res = await fetch('http://localhost/new_backend/uwu_pms_backend/api/coordinator/login.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // important for session cookies
-        body: JSON.stringify({ email, password })
-      });
+      // CoordinatorLoginPage.tsx (inside handleLogin)
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/coordinator/login.php`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // keep session cookie
+          body: JSON.stringify({ email, password }),
+        }
+      );
+
       const data = await res.json();
       if (data.success) {
         localStorage.setItem('user', JSON.stringify(data.user));
